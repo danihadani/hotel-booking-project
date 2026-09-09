@@ -67,12 +67,12 @@ const users = [
 ];
 
 async function seed() {
-  // Start from a clean slate. Order matters: a reservation points at a room,
-  // so the reservations have to go first.
-  await prisma.reservation.deleteMany();
-  await prisma.room.deleteMany();
-  await prisma.hotel.deleteMany();
-  await prisma.user.deleteMany();
+  // Start from a clean slate.
+  // deleteMany() would remove the rows but leave Postgres' id counter where it
+  // was, so a second seed would hand out ids 6, 7, 8...  TRUNCATE with
+  // RESTART IDENTITY zeroes the counter too, so ids always start at 1.
+  // CASCADE lets it clear the tables in spite of the foreign keys between them.
+  await prisma.$executeRaw`TRUNCATE TABLE "Reservation", "Room", "Hotel", "User" RESTART IDENTITY CASCADE`;
 
   for (const user of users) {
     const hashedPassword = await bcrypt.hash(user.password, 10);
