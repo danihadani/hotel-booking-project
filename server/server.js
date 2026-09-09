@@ -540,6 +540,31 @@ if (fs.existsSync(CLIENT_BUILD)) {
   app.use(express.static(CLIENT_BUILD));
   // React Router owns the paths, so every other URL gets index.html.
   app.get("*", (req, res) => res.sendFile(path.join(CLIENT_BUILD, "index.html")));
+} else {
+  // The API works, but there is no built React app to serve yet. Say so
+  // clearly instead of answering with a bare 404.
+  app.get("*", (req, res) =>
+    res.status(503).send(`<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<title>צד הלקוח עוד לא נבנה</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 640px; margin: 60px auto;
+         padding: 0 24px; line-height: 1.7; color: #23303d; }
+  code { background: #f1ece7; padding: 2px 6px; border-radius: 5px; }
+  pre  { background: #23303d; color: #fff; padding: 14px 18px; border-radius: 10px;
+         direction: ltr; text-align: left; overflow-x: auto; }
+</style></head><body>
+  <h1>השרת רץ — אבל אתר ה‑React עוד לא נבנה</h1>
+  <p>חסרה התיקייה <code>client/dist</code>. כדי לבנות אותה:</p>
+  <pre>cd client
+npm install
+npm run build</pre>
+  <p>ואז לרענן את העמוד הזה.</p>
+  <p>ה‑API עצמו עובד כבר עכשיו — אפשר לבדוק ב־
+     <a href="/api/available_rooms/?start_date=2026-03-10&amp;end_date=2026-03-13">
+     /api/available_rooms/</a>.</p>
+</body></html>`)
+  );
 }
 
 /******************** Server ********************/
