@@ -50,6 +50,53 @@ function roomToJson(room) {
   };
 }
 
+// Prisma hands dates back as JavaScript Date objects; the API speaks
+// plain "YYYY-MM-DD" strings.
+function dateToText(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function round2(value) {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+// Final price = (nights x price per night) + 18% VAT, as the assignment says.
+const VAT_RATE = 0.18;
+
+function calculatePrice(pricePerNight, nights) {
+  const subtotal = round2(pricePerNight * nights);
+  const vat = round2(subtotal * VAT_RATE);
+  return { subtotal, vat, total: round2(subtotal + vat) };
+}
+
+function reservationToJson(reservation) {
+  const { subtotal, vat, total } = calculatePrice(reservation.pricePerNight, reservation.nights);
+  return {
+    id: reservation.id,
+    guest_name: reservation.guestName,
+    start_date: dateToText(reservation.startDate),
+    end_date: dateToText(reservation.endDate),
+    nights: reservation.nights,
+    price_per_night: reservation.pricePerNight,
+    subtotal,
+    vat_rate: VAT_RATE,
+    vat,
+    total_price: total,
+    hotel: {
+      id: reservation.hotel.id,
+      name: reservation.hotel.name,
+      city: reservation.hotel.city,
+      country: reservation.hotel.country,
+    },
+    room: {
+      id: reservation.room.id,
+      name: reservation.room.name,
+      max_guests: reservation.room.maxGuests,
+      size: reservation.room.size,
+    },
+  };
+}
+
 /******************** Input Helpers ********************/
 // The assignment says every input must be checked. These three tiny functions
 // are the checks; the routes below just call them and answer 400 on a failure.
@@ -79,6 +126,11 @@ function isValidDate(text) {
 
 function toDate(text) {
   return new Date(`${text}T00:00:00Z`);
+}
+
+function nightsBetween(startText, endText) {
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  return Math.round((toDate(endText) - toDate(startText)) / MS_PER_DAY);
 }
 
 /******************** Auth Routes ********************/
@@ -323,6 +375,110 @@ app.post("/api/room", async (req, res) => {
   } catch (err) {
     console.error("POST /api/room", err);
     return res.status(500).json({ error: "Failed to create room" });
+  }
+});
+
+/******************** Reservation Routes ********************/
+// Making a reservation. Three things can go wrong, and each one has its own
+// page in the React app, so the error string is the name of that page:
+//   invalid_dates     the dates are missing, malformed or in the wrong order
+//   invalid_room      the chosen room does not belong to the chosen hotel
+//   unavaliable_room  the room is already booked on those dates
+app.post("/api/reservations", auth, async (req, res) => {
+  try {
+    const { guest_name, hotel, room, start_date, end_date } = req.body;
+
+    if (!isText(guest_name)) {
+      return res.status(400).json({ error: "guest_name is required" });
+    }
+
+    // ---- the dates ----
+    if (!isValidDate(start_date) || !isValidDate(end_date) || end_date <= start_date) {
+      return res.status(400).json({ error: "invalid_dates" });
+    }
+
+    // ---- the hotel and the room have to be real ids ----
+    if (!isWholeNumber(hotel, 1, Number.MAX_SAFE_INTEGER) ||
+        !isWholeNumber(room, 1, Number.MAX_SAFE_INTEGER)) {
+      return res.status(400).json({ error: "invalid_room" });
+    }
+
+    const hotelId = Number(hotel);
+    const roomId = Number(room);
+
+    // ---- does this room really belong to this hotel? ----
+    // Asking for the room AND the hotel id together is the whole check: if the
+    // guest picked a room from a different hotel, nothing comes back.
+    const chosenRoom = await prisma.room.findFirst({
+      where: { id: roomId, hotelId },
+      include: { hotel: true },
+    });
+    if (!chosenRoom) {
+      return res.status(400).json({ error: "invalid_room" });
+    }
+
+    // ---- is it free on those dates? (the same overlap rule as the search) ----
+    const clash = await prisma.reservation.findFirst({
+      where: {
+        roomId,
+        AND: [
+          { startDate: { lt: toDate(end_date) } },
+          { endDate: { gt: toDate(start_date) } },
+        ],
+      },
+    });
+    if (clash) {
+      return res.status(409).json({ error: "unavaliable_room" });
+    }
+
+    // ---- all good: save it ----
+    const nights = nightsBetween(start_date, end_date);
+    const { total } = calculatePrice(chosenRoom.price, nights);
+
+    const reservation = await prisma.reservation.create({
+      data: {
+        userId: req.userId, // put there by the auth middleware
+        hotelId,
+        roomId,
+        guestName: guest_name.trim(),
+        startDate: toDate(start_date),
+        endDate: toDate(end_date),
+        nights,
+        pricePerNight: chosenRoom.price, // the price as it is TODAY, kept forever
+        totalPrice: total,
+      },
+      include: { hotel: true, room: true },
+    });
+
+    return res.status(201).json(reservationToJson(reservation));
+  } catch (err) {
+    console.error("POST /api/reservations", err);
+    return res.status(500).json({ error: "Failed to create reservation" });
+  }
+});
+
+// The confirmation page reads the reservation back through this.
+app.get("/api/reservations/:id", auth, async (req, res) => {
+  const reservationId = Number(req.params.id);
+
+  if (!Number.isInteger(reservationId) || reservationId < 1) {
+    return res.status(400).json({ error: "id must be a positive whole number" });
+  }
+
+  try {
+    const reservation = await prisma.reservation.findUnique({
+      where: { id: reservationId },
+      include: { hotel: true, room: true },
+    });
+
+    if (!reservation) {
+      return res.status(404).json({ error: "Reservation not found" });
+    }
+
+    return res.status(200).json(reservationToJson(reservation));
+  } catch (err) {
+    console.error("GET /api/reservations/:id", err);
+    return res.status(500).json({ error: "Failed to fetch reservation" });
   }
 });
 
