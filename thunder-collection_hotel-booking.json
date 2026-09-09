@@ -1,0 +1,647 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Hotel Booking Project",
+  "dateExported": "2026-09-09T08:57:10.432378+00:00",
+  "version": "1.2",
+  "folders": [],
+  "requests": [
+    {
+      "_id": "040e975a-e1dd-4dbf-ba5e-b687f16c651c",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "01. Signup - new user",
+      "url": "http://127.0.0.1:8000/api/users/signup",
+      "method": "POST",
+      "sortNum": 10000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"username\": \"noa_test\",\n  \"full_name\": \"Noa Tester\",\n  \"email\": \"noa@example.com\",\n  \"password\": \"secret123\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "dd9f4650-3190-45c4-8dba-07b894d79037",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "02. Signup - password too short (400)",
+      "url": "http://127.0.0.1:8000/api/users/signup",
+      "method": "POST",
+      "sortNum": 20000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"username\": \"shorty\",\n  \"full_name\": \"Test\",\n  \"email\": \"t@example.com\",\n  \"password\": \"123\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "dcfa1640-5397-485e-9fb3-18d044ac064e",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "03. Login  <-- copy the token from here",
+      "url": "http://127.0.0.1:8000/api/users/login",
+      "method": "POST",
+      "sortNum": 30000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"username\": \"dana\",\n  \"password\": \"123456\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "65012ac0-0d8f-40b1-a02d-6496b6fdeeb7",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "04. Login - wrong password (401)",
+      "url": "http://127.0.0.1:8000/api/users/login",
+      "method": "POST",
+      "sortNum": 40000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "401"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"username\": \"dana\",\n  \"password\": \"wrong\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "003f3b1a-870d-43d4-b0f3-74259221686c",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "05. All hotels (needs token)",
+      "url": "http://127.0.0.1:8000/api/hotels",
+      "method": "GET",
+      "sortNum": 50000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "0cf6a7ad-9bb1-4fde-87f8-c2b8dfa9fece",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "06. All hotels WITHOUT a token (401)",
+      "url": "http://127.0.0.1:8000/api/hotels",
+      "method": "GET",
+      "sortNum": 60000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "401"
+        }
+      ]
+    },
+    {
+      "_id": "e2de1942-3a30-4658-a460-8c84e828cff2",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "07. Hotel 2 + its rooms",
+      "url": "http://127.0.0.1:8000/api/hotels/2",
+      "method": "GET",
+      "sortNum": 70000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "a45ff31f-900d-4d6d-807d-1b5b0892af51",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "08. All rooms of all hotels",
+      "url": "http://127.0.0.1:8000/api/rooms",
+      "method": "GET",
+      "sortNum": 80000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "a1c913e9-cbbd-4727-ac34-1a06f79c8420",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "09. Room 7 details",
+      "url": "http://127.0.0.1:8000/api/rooms/7",
+      "method": "GET",
+      "sortNum": 90000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "733f6717-e53a-4a90-881b-d4cf3b181f3b",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "10. ASSIGNMENT - add a hotel",
+      "url": "http://127.0.0.1:8000/api/hotel/",
+      "method": "POST",
+      "sortNum": 100000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"King David\",\n  \"country\": \"Israel\",\n  \"city\": \"Tel Aviv\",\n  \"number_of_rooms\": 400,\n  \"stars\": 5\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "77fdc2d4-f0ec-4970-bcbf-eb9d23d475eb",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "11. ASSIGNMENT - add a hotel, stars=9 (400)",
+      "url": "http://127.0.0.1:8000/api/hotel/",
+      "method": "POST",
+      "sortNum": 110000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Bad Hotel\",\n  \"country\": \"Israel\",\n  \"city\": \"Haifa\",\n  \"number_of_rooms\": 50,\n  \"stars\": 9\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "b7632e32-5d6a-4d69-a95d-7f4f429ef9f5",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "12. ASSIGNMENT - add a room",
+      "url": "http://127.0.0.1:8000/api/room/",
+      "method": "POST",
+      "sortNum": 120000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"hotel\": 2,\n  \"name\": \"Green Lagoon\",\n  \"size\": 78,\n  \"price\": 175,\n  \"max_guests\": 6\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "60bc94ac-cd87-4f46-b8b5-b96022e3daaf",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "13. ASSIGNMENT - add a room, no such hotel (400)",
+      "url": "http://127.0.0.1:8000/api/room/",
+      "method": "POST",
+      "sortNum": 130000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"hotel\": 9999,\n  \"name\": \"Ghost Room\",\n  \"size\": 20,\n  \"price\": 100,\n  \"max_guests\": 2\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "9d6bec12-21fd-418f-8939-0ea152c7206c",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "14. ASSIGNMENT - available rooms",
+      "url": "http://127.0.0.1:8000/api/available_rooms/?start_date=2026-03-10&end_date=2026-03-13",
+      "method": "GET",
+      "sortNum": 140000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [],
+      "params": [
+        {
+          "name": "start_date",
+          "value": "2026-03-10",
+          "isPath": false
+        },
+        {
+          "name": "end_date",
+          "value": "2026-03-13",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "788426f8-163a-4040-922d-3e6d7e4899ba",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "15. ASSIGNMENT - available rooms, bad date (400)",
+      "url": "http://127.0.0.1:8000/api/available_rooms/?start_date=2026-02-31&end_date=2026-03-05",
+      "method": "GET",
+      "sortNum": 150000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [],
+      "params": [
+        {
+          "name": "start_date",
+          "value": "2026-02-31",
+          "isPath": false
+        },
+        {
+          "name": "end_date",
+          "value": "2026-03-05",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        }
+      ]
+    },
+    {
+      "_id": "f6ef15f6-53c2-428e-b4a8-a6ca689048cb",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "16. Reservation - valid",
+      "url": "http://127.0.0.1:8000/api/reservations",
+      "method": "POST",
+      "sortNum": 160000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"guest_name\": \"Dana Levi\",\n  \"hotel\": 2,\n  \"room\": 7,\n  \"start_date\": \"2026-03-10\",\n  \"end_date\": \"2026-03-13\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "705eef75-e51c-4f0e-8e87-1908b37c74d8",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "17. Reservation - same dates -> unavaliable_room (409)",
+      "url": "http://127.0.0.1:8000/api/reservations",
+      "method": "POST",
+      "sortNum": 170000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "409"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"guest_name\": \"Yael\",\n  \"hotel\": 2,\n  \"room\": 7,\n  \"start_date\": \"2026-03-12\",\n  \"end_date\": \"2026-03-15\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "dc3d9ed9-27b1-4bb6-8a6d-d6c54879fe67",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "18. Reservation - room from another hotel -> invalid_room (400)",
+      "url": "http://127.0.0.1:8000/api/reservations",
+      "method": "POST",
+      "sortNum": 180000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"guest_name\": \"Yael\",\n  \"hotel\": 3,\n  \"room\": 7,\n  \"start_date\": \"2026-05-01\",\n  \"end_date\": \"2026-05-04\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "d392145e-fcb8-457d-b2c2-c4b35655c2b6",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "19. Reservation - checkout before checkin -> invalid_dates (400)",
+      "url": "http://127.0.0.1:8000/api/reservations",
+      "method": "POST",
+      "sortNum": 190000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"guest_name\": \"Yael\",\n  \"hotel\": 2,\n  \"room\": 7,\n  \"start_date\": \"2026-05-10\",\n  \"end_date\": \"2026-05-02\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "6747684d-60d7-4185-8f12-e07513daf611",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "20. Reservation - checkout day = next checkin day (201)",
+      "url": "http://127.0.0.1:8000/api/reservations",
+      "method": "POST",
+      "sortNum": 200000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"guest_name\": \"Yael\",\n  \"hotel\": 2,\n  \"room\": 7,\n  \"start_date\": \"2026-03-13\",\n  \"end_date\": \"2026-03-15\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "4849781c-5c7f-4249-95c4-93a3c40c09e8",
+      "colId": "8eda235d-658f-444c-9636-f04d14896e1a",
+      "containerId": "",
+      "name": "21. Read reservation 1 back",
+      "url": "http://127.0.0.1:8000/api/reservations/1",
+      "method": "GET",
+      "sortNum": 210000,
+      "created": "2026-09-09T08:57:10.432378+00:00",
+      "modified": "2026-09-09T08:57:10.432378+00:00",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{token}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    }
+  ]
+}
