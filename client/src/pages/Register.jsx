@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth.jsx';
+import { api } from '../api.js';
+import { saveLogin } from '../auth.js';
 
 const EMPTY = {
   username: '',
@@ -11,7 +12,6 @@ const EMPTY = {
 };
 
 export default function Register() {
-  const { register } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState([]);
@@ -19,7 +19,7 @@ export default function Register() {
 
   const change = (event) => setForm({ ...form, [event.target.name]: event.target.value });
 
-  /** The same rules the server checks - so the user gets an answer immediately. */
+  /** The same rules the server checks, so the user gets an answer immediately. */
   function checkInBrowser() {
     const found = [];
     if (!/^[A-Za-z0-9_.-]{3,50}$/.test(form.username)) {
@@ -40,10 +40,11 @@ export default function Register() {
     setErrors([]);
     setBusy(true);
     try {
-      await register(form);
+      const data = await api.signup(form);
+      saveLogin(data); // signing up logs you straight in
       navigate('/hotels', { replace: true });
     } catch (err) {
-      setErrors(err.errors);
+      setErrors([err.message]);
     } finally {
       setBusy(false);
     }

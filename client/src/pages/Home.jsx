@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import Hero from '../components/Hero.jsx';
-import { useAuth } from '../auth.jsx';
+import { isLoggedIn } from '../auth.js';
 
 export default function Home() {
-  const { user } = useAuth();
+  const loggedIn = isLoggedIn();
 
   return (
     <>
@@ -17,7 +17,7 @@ export default function Home() {
           שביקשת — אחרת תתקבל הודעת שגיאה מסבירה.
         </p>
 
-        {!user && (
+        {!loggedIn && (
           <p className="muted">
             <strong>שימי לב:</strong> כדי לבצע פעולה כלשהי באתר צריך להיות רשומה ומחוברת.
           </p>

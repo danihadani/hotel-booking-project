@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api.js';
-import { useAuth } from '../auth.jsx';
+import { getUser } from '../auth.js';
 
 export default function BookingForm() {
-  const { user } = useAuth();
+  const user = getUser();
   const navigate = useNavigate();
   const [params] = useSearchParams();
 
@@ -29,7 +29,7 @@ export default function BookingForm() {
         setHotels(hotelList);
         setRooms(roomList);
       })
-      .catch((err) => setErrors(err.errors));
+      .catch((err) => setErrors([err.message]));
   }, []);
 
   useEffect(() => {
@@ -64,10 +64,12 @@ export default function BookingForm() {
       const reservation = await api.createReservation(form);
       navigate(`/reservation/${reservation.id}`, { replace: true });
     } catch (err) {
-      if (err.reason === 'invalid_dates') navigate('/invalid_dates');
-      else if (err.reason === 'invalid_room') navigate('/invalid_room');
-      else if (err.reason === 'unavaliable_room') navigate('/unavaliable_room');
-      else setErrors(err.errors);
+      // The server answers with the name of the page to show.
+      if (['invalid_dates', 'invalid_room', 'unavaliable_room'].includes(err.reason)) {
+        navigate(`/${err.reason}`);
+      } else {
+        setErrors([err.message]);
+      }
     } finally {
       setBusy(false);
     }

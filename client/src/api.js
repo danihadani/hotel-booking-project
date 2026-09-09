@@ -1,14 +1,20 @@
 // ============================================================
-// One small helper for every call to the Express server.
-// "credentials: include" makes the browser send the login cookie.
+// Every call to the Express server goes through here.
+//
+// The login token lives in localStorage, and this file attaches it to
+// every request as   Authorization: Bearer <token>   - the same way the
+// library project does it.
 // ============================================================
+import { getToken } from './auth.js';
 
 async function request(url, options = {}) {
-  const response = await fetch(url, {
-    credentials: 'include',
-    headers: options.body ? { 'Content-Type': 'application/json' } : undefined,
-    ...options,
-  });
+  const headers = {};
+  if (options.body) headers['Content-Type'] = 'application/json';
+
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const response = await fetch(url, { ...options, headers });
 
   const text = await response.text();
   let data = null;
@@ -19,20 +25,20 @@ async function request(url, options = {}) {
   }
 
   if (!response.ok) {
-    const error = new Error((data && data.errors && data.errors[0]) || 'Request failed');
+    // The server answers with { error: "..." }. For a reservation that error
+    // is the name of the page to show: invalid_dates / invalid_room /
+    // unavaliable_room. Everything else is a message for the user.
+    const error = new Error((data && data.error) || 'Request failed');
     error.status = response.status;
-    error.reason = data && data.error; // invalid_dates / invalid_room / unavaliable_room
-    error.errors = (data && data.errors) || [error.message];
+    error.reason = data && data.error;
     throw error;
   }
   return data;
 }
 
 export const api = {
-  me: () => request('/api/me'),
-  login: (body) => request('/api/login', { method: 'POST', body: JSON.stringify(body) }),
-  register: (body) => request('/api/register', { method: 'POST', body: JSON.stringify(body) }),
-  logout: () => request('/api/logout', { method: 'POST' }),
+  signup: (body) => request('/api/users/signup', { method: 'POST', body: JSON.stringify(body) }),
+  login: (body) => request('/api/users/login', { method: 'POST', body: JSON.stringify(body) }),
 
   hotels: () => request('/api/hotels'),
   hotel: (id) => request(`/api/hotels/${id}`),

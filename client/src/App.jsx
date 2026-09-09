@@ -1,5 +1,5 @@
-import { Link, NavLink, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
-import { AuthProvider, RequireAuth, useAuth } from './auth.jsx';
+import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { getUser, isLoggedIn, logout } from './auth.js';
 
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
@@ -11,12 +11,21 @@ import BookingForm from './pages/BookingForm.jsx';
 import Confirmation from './pages/Confirmation.jsx';
 import ErrorPage from './components/ErrorPage.jsx';
 
-function Header() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+/** Wraps a page that only a logged-in user may see. */
+function RequireAuth({ children }) {
+  const location = useLocation();
+  if (!isLoggedIn()) {
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  }
+  return children;
+}
 
-  async function signOut() {
-    await logout();
+function Header() {
+  const navigate = useNavigate();
+  const user = getUser();
+
+  function signOut() {
+    logout();
     navigate('/');
   }
 
@@ -52,7 +61,7 @@ function Header() {
 
 export default function App() {
   return (
-    <AuthProvider>
+    <>
       <Header />
 
       <main className="page">
@@ -101,6 +110,6 @@ export default function App() {
       <footer className="site-footer">
         פרויקט מסכם — From Web to Database · Express + React + PostgreSQL
       </footer>
-    </AuthProvider>
+    </>
   );
 }

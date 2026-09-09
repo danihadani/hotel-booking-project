@@ -1,27 +1,27 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth.jsx';
+import { api } from '../api.js';
+import { saveLogin } from '../auth.js';
 
 export default function Login() {
-  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [form, setForm] = useState({ username: '', password: '' });
-  const [errors, setErrors] = useState([]);
+  const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const change = (event) =>
-    setForm({ ...form, [event.target.name]: event.target.value });
+  const change = (event) => setForm({ ...form, [event.target.name]: event.target.value });
 
   async function submit(event) {
     event.preventDefault();
-    setErrors([]);
+    setError('');
     setBusy(true);
     try {
-      await login(form);
+      const data = await api.login(form);
+      saveLogin(data); // keeps the token and the user in localStorage
       navigate(location.state?.from || '/hotels', { replace: true });
     } catch (err) {
-      setErrors(err.errors);
+      setError(err.message);
     } finally {
       setBusy(false);
     }
@@ -31,11 +31,7 @@ export default function Login() {
     <div className="card">
       <h2>כניסה לאתר</h2>
 
-      {errors.length > 0 && (
-        <div className="errors">
-          <ul>{errors.map((message) => <li key={message}>{message}</li>)}</ul>
-        </div>
-      )}
+      {error && <div className="errors">{error}</div>}
 
       <form className="stack" onSubmit={submit}>
         <label>
