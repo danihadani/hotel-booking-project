@@ -1,0 +1,195 @@
+# ============================================================
+#  Hotel Booking Project - all API requests
+#
+#  Free to run with the VS Code extension "REST Client"
+#  (by Huachao Mao). Open this file and click "Send Request"
+#  above any request below.
+#
+#  Run "03. Login" first, copy the token out of the response,
+#  and paste it into @token here.
+# ============================================================
+
+@baseUrl = http://127.0.0.1:8000
+@token = paste-the-token-from-request-03-here
+
+### 01. Signup - new user   ->  expects 201
+POST {{baseUrl}}/api/users/signup
+Content-Type: application/json
+
+{
+  "username": "noa_test",
+  "full_name": "Noa Tester",
+  "email": "noa@example.com",
+  "password": "secret123"
+}
+
+### 02. Signup - password too short   ->  expects 400
+POST {{baseUrl}}/api/users/signup
+Content-Type: application/json
+
+{
+  "username": "shorty",
+  "full_name": "Test",
+  "email": "t@example.com",
+  "password": "123"
+}
+
+### 03. Login - COPY THE TOKEN FROM HERE   ->  expects 200
+POST {{baseUrl}}/api/users/login
+Content-Type: application/json
+
+{
+  "username": "dana",
+  "password": "123456"
+}
+
+### 04. Login - wrong password   ->  expects 401
+POST {{baseUrl}}/api/users/login
+Content-Type: application/json
+
+{
+  "username": "dana",
+  "password": "wrong"
+}
+
+### 05. All hotels   ->  expects 200
+GET {{baseUrl}}/api/hotels
+Authorization: Bearer {{token}}
+
+### 06. All hotels WITHOUT a token   ->  expects 401
+GET {{baseUrl}}/api/hotels
+
+### 07. Hotel 2 and its rooms   ->  expects 200
+GET {{baseUrl}}/api/hotels/2
+Authorization: Bearer {{token}}
+
+### 08. All rooms of all hotels   ->  expects 200
+GET {{baseUrl}}/api/rooms
+Authorization: Bearer {{token}}
+
+### 09. Room 7 details   ->  expects 200
+GET {{baseUrl}}/api/rooms/7
+Authorization: Bearer {{token}}
+
+### 10. ASSIGNMENT - add a hotel   ->  expects 201
+POST {{baseUrl}}/api/hotel/
+Content-Type: application/json
+
+{
+  "name": "King David",
+  "country": "Israel",
+  "city": "Tel Aviv",
+  "number_of_rooms": 400,
+  "stars": 5
+}
+
+### 11. ASSIGNMENT - add a hotel, stars=9   ->  expects 400
+POST {{baseUrl}}/api/hotel/
+Content-Type: application/json
+
+{
+  "name": "Bad Hotel",
+  "country": "Israel",
+  "city": "Haifa",
+  "number_of_rooms": 50,
+  "stars": 9
+}
+
+### 12. ASSIGNMENT - add a room   ->  expects 201
+POST {{baseUrl}}/api/room/
+Content-Type: application/json
+
+{
+  "hotel": 2,
+  "name": "Green Lagoon",
+  "size": 78,
+  "price": 175,
+  "max_guests": 6
+}
+
+### 13. ASSIGNMENT - add a room, no such hotel   ->  expects 400
+POST {{baseUrl}}/api/room/
+Content-Type: application/json
+
+{
+  "hotel": 9999,
+  "name": "Ghost Room",
+  "size": 20,
+  "price": 100,
+  "max_guests": 2
+}
+
+### 14. ASSIGNMENT - available rooms   ->  expects 200
+GET {{baseUrl}}/api/available_rooms/?start_date=2026-03-10&end_date=2026-03-13
+
+### 15. ASSIGNMENT - available rooms, bad date   ->  expects 400
+GET {{baseUrl}}/api/available_rooms/?start_date=2026-02-31&end_date=2026-03-05
+
+### 16. Reservation - valid   ->  expects 201
+POST {{baseUrl}}/api/reservations
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "guest_name": "Dana Levi",
+  "hotel": 2,
+  "room": 7,
+  "start_date": "2026-03-10",
+  "end_date": "2026-03-13"
+}
+
+### 17. Reservation - overlapping -> unavaliable_room   ->  expects 409
+POST {{baseUrl}}/api/reservations
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "guest_name": "Yael",
+  "hotel": 2,
+  "room": 7,
+  "start_date": "2026-03-12",
+  "end_date": "2026-03-15"
+}
+
+### 18. Reservation - wrong hotel -> invalid_room   ->  expects 400
+POST {{baseUrl}}/api/reservations
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "guest_name": "Yael",
+  "hotel": 3,
+  "room": 7,
+  "start_date": "2026-05-01",
+  "end_date": "2026-05-04"
+}
+
+### 19. Reservation - bad dates -> invalid_dates   ->  expects 400
+POST {{baseUrl}}/api/reservations
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "guest_name": "Yael",
+  "hotel": 2,
+  "room": 7,
+  "start_date": "2026-05-10",
+  "end_date": "2026-05-02"
+}
+
+### 20. Reservation - checkout day = next checkin day   ->  expects 201
+POST {{baseUrl}}/api/reservations
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "guest_name": "Yael",
+  "hotel": 2,
+  "room": 7,
+  "start_date": "2026-03-13",
+  "end_date": "2026-03-15"
+}
+
+### 21. Read reservation 1 back   ->  expects 200
+GET {{baseUrl}}/api/reservations/1
+Authorization: Bearer {{token}}
