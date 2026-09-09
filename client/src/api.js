@@ -42,5 +42,4 @@ export const api = {
   createReservation: (body) =>
     request('/api/reservations', { method: 'POST', body: JSON.stringify(body) }),
   reservation: (id) => request(`/api/reservations/${id}`),
-  myReservations: () => request('/api/my-reservations'),
 };

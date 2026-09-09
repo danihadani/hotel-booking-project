@@ -9,7 +9,6 @@ import HotelDetails from './pages/HotelDetails.jsx';
 import RoomDetails from './pages/RoomDetails.jsx';
 import BookingForm from './pages/BookingForm.jsx';
 import Confirmation from './pages/Confirmation.jsx';
-import MyReservations from './pages/MyReservations.jsx';
 import ErrorPage from './components/ErrorPage.jsx';
 
 function Header() {
@@ -34,7 +33,6 @@ function Header() {
           <NavLink to="/book">הזמנה</NavLink>
           {user ? (
             <>
-              <NavLink to="/my-reservations">ההזמנות שלי</NavLink>
               <span className="who">שלום, {user.full_name}</span>
               <button className="btn small" onClick={signOut}>
                 יציאה
@@ -69,7 +67,6 @@ export default function App() {
           <Route path="/rooms/:id" element={<RequireAuth><RoomDetails /></RequireAuth>} />
           <Route path="/book" element={<RequireAuth><BookingForm /></RequireAuth>} />
           <Route path="/reservation/:id" element={<RequireAuth><Confirmation /></RequireAuth>} />
-          <Route path="/my-reservations" element={<RequireAuth><MyReservations /></RequireAuth>} />
 
           {/* The three reservation error pages. */}
           <Route

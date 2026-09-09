@@ -115,7 +115,6 @@ existing.start_date < requested.end_date  AND  existing.end_date > requested.sta
 | GET | `/api/rooms/:id` | כן |
 | POST | `/api/reservations` | כן |
 | GET | `/api/reservations/:id` | כן |
-| GET | `/api/my-reservations` | כן |
 
 ### בדיקה ב‑Thunder Client
 
@@ -137,7 +136,6 @@ existing.start_date < requested.end_date  AND  existing.end_date > requested.sta
 | `/rooms/:id` | פרטי חדר: שם, מספר סידורי, מקסימום אורחים, מחיר ללילה, גודל + "הזמן עכשיו" |
 | `/book` | טופס הזמנה |
 | `/reservation/:id` | אישור הזמנה עם מספר ההזמנה והמחיר הסופי |
-| `/my-reservations` | כל ההזמנות של המשתמשת המחוברת |
 | `/unavaliable_room` | שגיאה: החדר תפוס בתאריכים המבוקשים |
 | `/invalid_room` | שגיאה: החדר אינו שייך למלון שנבחר |
 | `/invalid_dates` | שגיאה: התאריכים אינם תקינים |
