@@ -15,32 +15,58 @@
 
 ## 1. התקנה והרצה
 
-### א. הכנת מסד הנתונים
+### מה צריך להיות מותקן
 
-צריך PostgreSQL מותקן ורץ. פותחים טרמינל ויוצרים משתמש ומסד נתונים:
+| | איך בודקים | מאיפה מתקינים |
+|---|---|---|
+| Node.js 18+ | `node --version` | https://nodejs.org |
+| PostgreSQL | `psql --version` | https://www.postgresql.org/download/ |
+
+### א. להוריד את הפרויקט
 
 ```bash
+git clone https://github.com/danihadani/hotel-booking-project
+cd hotel-booking-project
+```
+
+### ב. הכנת מסד הנתונים
+
+יוצרים משתמש ומסד נתונים ריק:
+
+```bash
+# Mac / Linux
 psql -U postgres -c "CREATE USER booking WITH PASSWORD 'booking';"
 psql -U postgres -c "CREATE DATABASE booking OWNER booking;"
 ```
 
-### ב. השרת
+בווינדוס פותחים **SQL Shell (psql)** מתפריט ההתחלה, מתחברים כ‑`postgres`,
+ומריצים את שתי השורות בלי החלק של `psql -U postgres -c` ובלי המרכאות.
+
+### ג. השרת
 
 ```bash
-cd booking/server
-cp .env.example .env      # אפשר לערוך את פרטי החיבור אם הם שונים אצלך
+cd server
+cp .env.example .env       # בווינדוס:  copy .env.example .env
 npm install
-npm run initdb            # יוצר את הטבלאות (מוחק טבלאות קיימות!)
-npm run seed              # ממלא 5 מלונות, 26 חדרים ו‑2 משתמשים לדוגמה
+npx prisma migrate dev     # בונה את הטבלאות לפי prisma/schema.prisma
+npm run seed               # ממלא 5 מלונות, 26 חדרים ו‑2 משתמשים לדוגמה
 npm start
 ```
 
-### ג. צד הלקוח
+אם פרטי החיבור שלך ל‑PostgreSQL שונים (משתמש, סיסמה או פורט) — עורכים את
+`DATABASE_URL` בקובץ `.env` לפני `npx prisma migrate dev`.
+
+בדיקה שהכל עלה: לפתוח בדפדפן **http://127.0.0.1:8000/api/hotels** —
+אמור להופיע JSON עם חמישה מלונות.
+
+### ד. צד הלקוח
+
+בטרמינל **שני** (השרת ממשיך לרוץ בראשון):
 
 ```bash
-cd booking/client
+cd client
 npm install
-npm run build             # בונה את אתר ה‑React לתוך client/dist
+npm run build              # בונה את אתר ה‑React לתוך client/dist
 ```
 
 עכשיו נכנסים ל‑**http://127.0.0.1:8000** — השרת מגיש גם את האתר וגם את ה‑API.
@@ -49,12 +75,22 @@ npm run build             # בונה את אתר ה‑React לתוך client/dist
 
 ### פיתוח (אופציונלי)
 
-בזמן עבודה על ה‑React נוח יותר להריץ שני טרמינלים:
+בזמן עבודה על ה‑React נוח יותר להריץ שני שרתים, כמו בפרויקטים של הקורס:
 
 ```bash
-cd booking/server && npm run dev     # פורט 8000
-cd booking/client && npm run dev     # פורט 5173, מעביר כל /api לפורט 8000
+cd server && npm run dev     # פורט 8000
+cd client && npm run dev     # פורט 5173, מעביר כל /api לפורט 8000
 ```
+
+### פקודות שימושיות
+
+| פקודה | מה היא עושה |
+|-------|-------------|
+| `npm start` | מריץ את השרת |
+| `npm run dev` | מריץ את השרת ומרענן אותו אוטומטית בכל שינוי בקוד |
+| `npm run seed` | מאפס את הנתונים וממלא מחדש נתוני דמו |
+| `npx prisma migrate dev` | מחיל שינויים מ‑`schema.prisma` על מסד הנתונים |
+| `npx prisma studio` | פותח ממשק בדפדפן לעיון בטבלאות |
 
 ---
 
