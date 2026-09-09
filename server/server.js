@@ -5,6 +5,14 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
 
+import {
+  hashPassword,
+  comparePassword,
+  auth,
+  createToken,
+  validateSignup,
+} from "./auth.js";
+
 /******************** For Prisma ********************/
 import { prisma } from "./prisma.js";
 
@@ -73,8 +81,75 @@ function toDate(text) {
   return new Date(`${text}T00:00:00Z`);
 }
 
+/******************** Auth Routes ********************/
+app.post("/api/users/signup", async (req, res) => {
+  try {
+    const { username, fullName, email, password } = validateSignup(req.body);
+
+    const existing = await prisma.user.findUnique({ where: { username } });
+    if (existing) {
+      return res.status(409).json({ error: "This username is already taken" });
+    }
+
+    const hashedPassword = await hashPassword(password);
+    const user = await prisma.user.create({
+      data: { username, fullName, email, password: hashedPassword },
+    });
+
+    // Log her straight in, so she does not have to type it all again.
+    const token = createToken(user);
+    return res.status(201).json({
+      token,
+      user: { id: user.id, username: user.username, full_name: user.fullName },
+    });
+  } catch (err) {
+    if (err.message === "ALL_FIELDS_REQUIRED") {
+      return res.status(400).json({ error: "username, full_name, email and password are required" });
+    }
+    if (err.message === "INVALID_USERNAME") {
+      return res.status(400).json({ error: "username must be 3-50 characters: letters, digits, . _ -" });
+    }
+    if (err.message === "INVALID_EMAIL") {
+      return res.status(400).json({ error: "invalid email" });
+    }
+    if (err.message === "PASSWORD_TOO_SHORT") {
+      return res.status(400).json({ error: "password must be at least 6 characters" });
+    }
+
+    console.error("POST /api/users/signup", err);
+    return res.status(500).json({ error: "Failed to create user" });
+  }
+});
+
+app.post("/api/users/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: "username and password are required" });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({ where: { username: username.trim() } });
+
+    // The same answer for "no such user" and "wrong password", so nobody can
+    // use this endpoint to discover which usernames exist.
+    if (!user || !(await comparePassword(password, user.password))) {
+      return res.status(401).json({ error: "invalid credentials" });
+    }
+
+    const token = createToken(user);
+    return res.status(200).json({
+      token,
+      user: { id: user.id, username: user.username, full_name: user.fullName },
+    });
+  } catch (err) {
+    console.error("POST /api/users/login", err);
+    return res.status(500).json({ error: "Failed to login" });
+  }
+});
+
 /******************** Hotel Routes ********************/
-app.get("/api/hotels", async (req, res) => {
+app.get("/api/hotels", auth, async (req, res) => {
   try {
     const hotels = await prisma.hotel.findMany({ orderBy: { id: "asc" } });
 
@@ -85,7 +160,7 @@ app.get("/api/hotels", async (req, res) => {
   }
 });
 
-app.get("/api/hotels/:id", async (req, res) => {
+app.get("/api/hotels/:id", auth, async (req, res) => {
   const hotelId = Number(req.params.id);
 
   if (!Number.isInteger(hotelId) || hotelId < 1) {
@@ -155,7 +230,7 @@ app.post("/api/hotel", async (req, res) => {
 /******************** Room Routes ********************/
 // Every room of every hotel. The booking form needs this: the assignment says
 // its room dropdown may list rooms that do not belong to the chosen hotel.
-app.get("/api/rooms", async (req, res) => {
+app.get("/api/rooms", auth, async (req, res) => {
   try {
     const rooms = await prisma.room.findMany({
       orderBy: { id: "asc" },
@@ -171,7 +246,7 @@ app.get("/api/rooms", async (req, res) => {
   }
 });
 
-app.get("/api/rooms/:id", async (req, res) => {
+app.get("/api/rooms/:id", auth, async (req, res) => {
   const roomId = Number(req.params.id);
 
   if (!Number.isInteger(roomId) || roomId < 1) {
