@@ -1,0 +1,79 @@
+// ============================================================
+// Booking Mini - the single source of truth for the database.
+//
+//   npx prisma migrate dev --name <name>   ->  builds the real tables
+//   npx prisma generate                    ->  builds the JS client
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- a registered visitor ----------
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String // stored hashed, never in plain text
+  fullName  String
+  email     String
+  createdAt DateTime @default(now())
+
+  reservations Reservation[]
+}
+
+// ---------- a hotel ----------
+model Hotel {
+  id            Int    @id @default(autoincrement())
+  name          String
+  country       String
+  city          String
+  numberOfRooms Int
+  stars         Int
+
+  rooms        Room[]
+  reservations Reservation[]
+}
+
+// ---------- a room inside one hotel ----------
+model Room {
+  id        Int    @id @default(autoincrement())
+  name      String
+  maxGuests Int
+  price     Float
+  size      Int
+
+  hotelId Int // the real foreign-key column
+  hotel   Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  reservations Reservation[]
+}
+
+// ---------- one booking of one room, for one date range ----------
+model Reservation {
+  id        Int      @id @default(autoincrement())
+  guestName String
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
+
+  // A snapshot of the price at the moment of booking: if the hotel raises
+  // its prices later, this confirmation must still show what was paid.
+  nights        Int
+  pricePerNight Float
+  totalPrice    Float
+  createdAt     DateTime @default(now())
+
+  userId  Int
+  hotelId Int // the hotel the guest ASKED for
+  roomId  Int
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hotel   Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  room    Room  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  // Makes the "is this room free?" question fast.
+  @@index([roomId, startDate, endDate])
+}
