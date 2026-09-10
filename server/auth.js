@@ -4,7 +4,19 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-only-secret";
+// Refuse to start without a secret rather than quietly falling back to one
+// written in the code: this file is on GitHub, so a fallback secret would be
+// public, and anyone could forge a token with it.
+if (!process.env.JWT_SECRET) {
+  throw new Error(
+    "JWT_SECRET is missing. Copy server/.env.example to server/.env and set it.",
+  );
+}
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// How long a login lasts. This is a decision about how the app behaves, the
+// same on every machine, so it belongs in the code and not in .env.
 const TOKEN_LIFETIME = "1d";
 
 /******************** Passwords ********************/
