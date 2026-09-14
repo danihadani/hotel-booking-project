@@ -1,4 +1,4 @@
-import ErrorPage from '../components/ErrorPage.jsx';
+import ErrorPage from './ErrorPage.jsx';
 
 /**
  * The three reservation error pages the assignment specifies.

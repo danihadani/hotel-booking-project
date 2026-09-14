@@ -3,15 +3,15 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Header from './components/Header.jsx';
 import RequireAuth from './components/RequireAuth.jsx';
 
-import Home from './pages/Home.jsx';
-import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
-import Hotels from './pages/Hotels.jsx';
-import HotelDetails from './pages/HotelDetails.jsx';
-import RoomDetails from './pages/RoomDetails.jsx';
-import BookingForm from './pages/BookingForm.jsx';
-import Confirmation from './pages/Confirmation.jsx';
-import { UnavaliableRoom, InvalidRoom, InvalidDates } from './pages/ErrorPages.jsx';
+import Home from './components/Home.jsx';
+import Login from './components/Login.jsx';
+import Register from './components/Register.jsx';
+import Hotels from './components/Hotels.jsx';
+import HotelDetails from './components/HotelDetails.jsx';
+import RoomDetails from './components/RoomDetails.jsx';
+import BookingForm from './components/BookingForm.jsx';
+import Confirmation from './components/Confirmation.jsx';
+import { UnavaliableRoom, InvalidRoom, InvalidDates } from './components/ErrorPages.jsx';
 
 /**
  * The shape of the whole site: a fixed header, the page for the current

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import Hero from '../components/Hero.jsx';
+import Hero from './Hero.jsx';
 import { isLoggedIn } from '../auth.js';
 
 export default function Home() {

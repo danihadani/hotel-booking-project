@@ -1,271 +1,33 @@
-/* ============================================================
-   Booking Mini - styles
-   Right-to-left Hebrew layout, warm "sunset over the sea" palette.
-   ============================================================ */
+@import "tailwindcss";
 
-:root {
-  --sand: #fff7ef;
-  --ink: #23303d;
-  --muted: #6b7d8f;
-  --sun: #ff8a4c;
-  --sun-deep: #e2582f;
-  --sea: #1f6f8b;
-  --sea-deep: #144a5e;
-  --line: #e6d9cc;
-  --card: #ffffff;
-  --danger: #c0392b;
-  --ok: #1e7d5a;
-  --radius: 14px;
-  --shadow: 0 6px 20px rgba(35, 48, 61, 0.08);
+/* ============================================================
+   The design system, in one place.
+   Tailwind v4 reads this block and turns every entry into a
+   utility class: --color-acid becomes bg-acid, text-acid, ...
+   ============================================================ */
+@theme {
+  --color-ink: #000000;
+  --color-paper: #ffffff;
+  --color-acid: #d8ff3e;
+  --color-smoke: #6b6b6b;
+  --color-hairline: #e4e4e0;
+
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
-* { box-sizing: border-box; }
+/* Numbers line up in columns everywhere - prices, dates, ids. */
+html {
+  font-variant-numeric: tabular-nums;
+}
 
 body {
-  margin: 0;
-  font-family: "Segoe UI", "Rubik", "Arial Hebrew", Arial, sans-serif;
-  background: var(--sand);
-  color: var(--ink);
-  line-height: 1.6;
+  @apply bg-paper text-ink font-sans;
+  -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--sea); }
-
-.page {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 20px 60px;
-}
-
-/* ---------- header ---------- */
-.site-header {
-  background: linear-gradient(100deg, var(--sea-deep), var(--sea));
-  color: #fff;
-  box-shadow: var(--shadow);
-}
-
-.site-header .inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
-}
-
-.brand {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: #fff;
-  text-decoration: none;
-  letter-spacing: 0.5px;
-}
-
-.brand span { color: #ffd7a8; }
-
-.site-header nav {
-  display: flex;
-  gap: 16px;
-  margin-inline-start: auto;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.site-header nav a {
-  color: #eaf6fb;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 6px 2px;
-  border-bottom: 2px solid transparent;
-}
-
-.site-header nav a:hover,
-.site-header nav a.active { border-bottom-color: #ffd7a8; }
-
-.who { color: #cfe7f0; font-size: 0.9rem; }
-
-/* ---------- hero ---------- */
-.hero {
-  position: relative;
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin: 24px 0 32px;
-  box-shadow: var(--shadow);
-}
-
-.hero svg { display: block; width: 100%; height: auto; }
-
-.hero-text {
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline: 0;
-  padding: 26px 30px;
-  background: linear-gradient(to top, rgba(20, 74, 94, 0.85), transparent);
-  color: #fff;
-}
-
-.hero-text h1 { margin: 0 0 6px; font-size: clamp(1.5rem, 4vw, 2.4rem); }
-.hero-text p { margin: 0; font-size: 1.05rem; }
-
-/* ---------- cards & lists ---------- */
-.card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 20px 22px;
-  box-shadow: var(--shadow);
-  margin-bottom: 18px;
-}
-
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-}
-
-.card-grid .card { margin: 0; }
-
-.card h3 { margin: 0 0 6px; }
-
-.stars { color: var(--sun-deep); letter-spacing: 2px; }
-
-.muted { color: var(--muted); }
-
-.detail-list {
-  list-style: none;
-  padding: 0;
-  margin: 12px 0 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px 20px;
-}
-
-.detail-list li {
-  border-inline-start: 3px solid var(--sun);
-  padding-inline-start: 10px;
-}
-
-.detail-list .label {
-  display: block;
-  font-size: 0.82rem;
-  color: var(--muted);
-}
-
-.detail-list .value { font-weight: 700; }
-
-.room-links { list-style: none; padding: 0; margin: 10px 0 0; }
-
-.room-links li {
-  border-bottom: 1px dashed var(--line);
-  padding: 9px 0;
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.room-links li:last-child { border-bottom: none; }
-
-/* ---------- buttons ---------- */
-.btn {
-  display: inline-block;
-  background: var(--sun);
-  color: #fff;
-  border: none;
-  border-radius: 999px;
-  padding: 10px 22px;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background 0.15s ease;
-}
-
-.btn:hover { background: var(--sun-deep); }
-
-.btn.small { padding: 5px 15px; font-size: 0.9rem; }
-
-.btn.secondary { background: var(--sea); }
-.btn.secondary:hover { background: var(--sea-deep); }
-.btn:disabled { background: #c9ccd0; cursor: not-allowed; }
-
-.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
-
-/* ---------- forms ---------- */
-form.stack { display: grid; gap: 14px; max-width: 480px; }
-form.wide { max-width: 640px; }
-
-label { display: grid; gap: 5px; font-weight: 600; }
-
-input, select {
-  font: inherit;
-  padding: 9px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-  color: var(--ink);
-}
-
-input:focus, select:focus {
-  outline: 2px solid var(--sun);
-  outline-offset: 1px;
-}
-
-.field-hint { font-weight: 400; font-size: 0.82rem; color: var(--muted); }
-
-.errors {
-  background: #fdecea;
-  border: 1px solid #f5c6c0;
-  color: var(--danger);
-  border-radius: 10px;
-  padding: 10px 14px;
-  margin: 0 0 4px;
-}
-
-.errors ul { margin: 0; padding-inline-start: 18px; }
-
-/* ---------- confirmation ---------- */
-.confirm-banner {
-  background: #e8f6f0;
-  border: 1px solid #b9e2d1;
-  color: var(--ok);
-  border-radius: var(--radius);
-  padding: 16px 20px;
-  font-weight: 700;
-  margin-bottom: 18px;
-}
-
-.price-box {
-  margin-top: 16px;
-  border-top: 2px solid var(--line);
-  padding-top: 12px;
-}
-
-.price-row { display: flex; justify-content: space-between; max-width: 340px; }
-.price-row.total { font-size: 1.25rem; font-weight: 800; color: var(--sun-deep); }
-
-/* ---------- error pages ---------- */
-.error-page {
-  border: 2px solid #f0b8c4;
-  border-radius: var(--radius);
-  background: #fff;
-  padding: 26px 30px;
-  margin-top: 30px;
-  font-family: "Times New Roman", Georgia, serif;
-  direction: ltr;
-  text-align: left;
-}
-
-.error-page h1 { margin: 0 0 8px; font-size: 1.7rem; }
-.error-page h2 { margin: 0; font-size: 1.05rem; }
-.error-page .back { direction: rtl; text-align: right; margin-top: 18px; font-family: inherit; }
-
-/* ---------- footer ---------- */
-.site-footer {
-  border-top: 1px solid var(--line);
-  padding: 18px 20px;
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.88rem;
+/* The one piece of hand-written CSS: the label style that repeats all over
+   the design - tiny, wide-tracked, uppercase. */
+@utility label {
+  @apply font-mono text-[10px] font-bold tracking-[0.18em] uppercase;
 }

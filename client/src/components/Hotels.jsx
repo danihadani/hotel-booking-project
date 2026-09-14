@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api.js';
-import Stars from '../components/Stars.jsx';
+import Stars from './Stars.jsx';
 
 export default function Hotels() {
   const [hotels, setHotels] = useState(null);
