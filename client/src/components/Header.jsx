@@ -1,10 +1,12 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { getUser, logout } from '../auth.js';
 
+const link = ({ isActive }) =>
+  `label px-2.5 py-1.5 no-underline ${isActive ? 'bg-acid text-ink' : 'text-ink hover:bg-hairline'}`;
+
 /**
- * The bar at the top of every page.
- * It lives outside <Routes> in App.jsx, so it is written once and shown
- * everywhere - React only swaps the content underneath it.
+ * The bar at the top of every page. It sits outside <Routes> in App.jsx, so
+ * it is written once and shown everywhere.
  */
 export default function Header() {
   const navigate = useNavigate();
@@ -16,30 +18,28 @@ export default function Header() {
   }
 
   return (
-    <header className="site-header">
-      <div className="inner">
-        <Link className="brand" to="/">
-          Booking<span>Mini</span>
+    <header className="border-b-2 border-ink">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-6 py-3.5 sm:px-9">
+        <Link to="/" className="text-[15px] font-extrabold tracking-[-0.04em] no-underline text-ink">
+          BOOKING<span className="text-smoke">·</span>MINI
         </Link>
 
-        <nav>
-          {/* NavLink marks itself "active" on the current page, which is what
-              draws the orange underline. */}
-          <NavLink to="/">דף הבית</NavLink>
-          <NavLink to="/hotels">מלונות</NavLink>
-          <NavLink to="/book">הזמנה</NavLink>
+        <nav className="ml-auto flex items-center gap-1">
+          <NavLink to="/" end className={link}>Home</NavLink>
+          <NavLink to="/hotels" className={link}>Hotels</NavLink>
+          <NavLink to="/book" className={link}>Book</NavLink>
 
           {user ? (
             <>
-              <span className="who">שלום, {user.full_name}</span>
-              <button className="btn small" onClick={signOut}>
-                יציאה
+              <span className="label ml-2 text-smoke">{user.full_name}</span>
+              <button onClick={signOut} className="label ml-1 cursor-pointer border-0 bg-ink px-2.5 py-1.5 text-paper hover:bg-acid hover:text-ink">
+                Sign out
               </button>
             </>
           ) : (
             <>
-              <NavLink to="/register">הרשם</NavLink>
-              <NavLink to="/login">כניסה</NavLink>
+              <NavLink to="/register" className={link}>Sign up</NavLink>
+              <NavLink to="/login" className={link}>Log in</NavLink>
             </>
           )}
         </nav>

@@ -2,14 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 import { saveLogin } from '../auth.js';
+import Field, { Errors, Submit, FormShell } from './Field.jsx';
 
-const EMPTY = {
-  username: '',
-  full_name: '',
-  email: '',
-  password: '',
-  password_confirm: '',
-};
+const EMPTY = { username: '', full_name: '', email: '', password: '', password_confirm: '' };
 
 export default function Register() {
   const navigate = useNavigate();
@@ -17,18 +12,18 @@ export default function Register() {
   const [errors, setErrors] = useState([]);
   const [busy, setBusy] = useState(false);
 
-  const change = (event) => setForm({ ...form, [event.target.name]: event.target.value });
+  const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  /** The same rules the server checks, so the user gets an answer immediately. */
+  /** The same rules the server applies, so the answer is immediate. */
   function checkInBrowser() {
     const found = [];
     if (!/^[A-Za-z0-9_.-]{3,50}$/.test(form.username)) {
-      found.push('שם משתמש: 3–50 תווים באנגלית, ספרות או . _ -');
+      found.push('Username: 3–50 characters — letters, digits, . _ or -');
     }
-    if (form.full_name.trim().length < 2) found.push('יש להזין שם מלא');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) found.push('כתובת האימייל אינה תקינה');
-    if (form.password.length < 6) found.push('הסיסמה חייבת להיות באורך 6 תווים לפחות');
-    if (form.password !== form.password_confirm) found.push('שתי הסיסמאות אינן זהות');
+    if (form.full_name.trim().length < 2) found.push('Please enter your full name');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) found.push('That email address is not valid');
+    if (form.password.length < 6) found.push('Password must be at least 6 characters');
+    if (form.password !== form.password_confirm) found.push('The two passwords do not match');
     return found;
   }
 
@@ -40,8 +35,7 @@ export default function Register() {
     setErrors([]);
     setBusy(true);
     try {
-      const data = await api.signup(form);
-      saveLogin(data); // signing up logs you straight in
+      saveLogin(await api.signup(form));   // signing up logs you straight in
       navigate('/hotels', { replace: true });
     } catch (err) {
       setErrors([err.message]);
@@ -51,53 +45,24 @@ export default function Register() {
   }
 
   return (
-    <div className="card">
-      <h2>רישום משתמש/ת חדש/ה</h2>
-
-      {errors.length > 0 && (
-        <div className="errors">
-          <ul>{errors.map((message) => <li key={message}>{message}</li>)}</ul>
-        </div>
-      )}
-
-      <form className="stack" onSubmit={submit}>
-        <label>
-          שם משתמש
-          <input name="username" value={form.username} onChange={change} required autoFocus />
-          <span className="field-hint">אותיות באנגלית, ספרות, נקודה, מקף או קו תחתון</span>
-        </label>
-        <label>
-          שם מלא
-          <input name="full_name" value={form.full_name} onChange={change} required />
-        </label>
-        <label>
-          אימייל
-          <input type="email" name="email" value={form.email} onChange={change} required />
-        </label>
-        <label>
-          סיסמה
-          <input type="password" name="password" value={form.password} onChange={change} required minLength={6} />
-        </label>
-        <label>
-          אימות סיסמה
-          <input
-            type="password"
-            name="password_confirm"
-            value={form.password_confirm}
-            onChange={change}
-            required
-          />
-        </label>
-        <div className="actions">
-          <button className="btn" disabled={busy}>
-            {busy ? 'רגע…' : 'הרשמה'}
-          </button>
-        </div>
+    <FormShell eyebrow="Takes about a minute" title="SIGN UP">
+      <form onSubmit={submit} className="grid gap-6">
+        <Errors items={errors} />
+        <Field label="Username" name="username" value={form.username} onChange={change} required autoFocus
+               hint="Letters, digits, dot, dash or underscore" />
+        <Field label="Full name" name="full_name" value={form.full_name} onChange={change} required />
+        <Field label="Email" type="email" name="email" value={form.email} onChange={change} required />
+        <Field label="Password" type="password" name="password" value={form.password} onChange={change} required minLength={6} />
+        <Field label="Confirm password" type="password" name="password_confirm" value={form.password_confirm} onChange={change} required />
+        <div><Submit busy={busy}>Create account →</Submit></div>
       </form>
 
-      <p className="muted">
-        כבר רשומה? <Link to="/login">לכניסה לאתר</Link>
+      <p className="label mt-10 text-smoke">
+        Already registered?{' '}
+        <Link to="/login" className="text-ink underline decoration-acid decoration-4 underline-offset-4">
+          Log in
+        </Link>
       </p>
-    </div>
+    </FormShell>
   );
 }

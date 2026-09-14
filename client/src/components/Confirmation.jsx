@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api.js';
+import { Notice } from './Hotels.jsx';
 
 export default function Confirmation() {
   const { id } = useParams();
@@ -11,72 +12,68 @@ export default function Confirmation() {
     api.reservation(id).then(setReservation).catch((err) => setError(err.message));
   }, [id]);
 
-  if (error) return <div className="errors">{error}</div>;
-  if (!reservation) return <p className="muted">טוען אישור הזמנה…</p>;
+  if (error) return <Notice>{error}</Notice>;
+  if (!reservation) return <Notice>Loading your confirmation…</Notice>;
 
-  const money = (amount) => `${amount.toFixed(2)} ₪`;
+  const money = (n) => n.toFixed(2);
 
   return (
-    <>
-      <div className="confirm-banner">
-        ההזמנה אושרה! מספר ההזמנה שלך הוא {reservation.id}
-      </div>
+    <div className="mx-auto max-w-6xl px-6 sm:px-9">
+      <p className="label mt-12 text-smoke">Confirmed</p>
 
-      <div className="card">
-        <h2>אישור הזמנה</h2>
+      <h1 className="mt-4 text-[clamp(2.5rem,7vw,4.5rem)] font-extrabold leading-[0.85] tracking-[-0.06em]">
+        RESERVATION <span className="bg-acid px-2">#{String(reservation.id).padStart(4, '0')}</span>
+      </h1>
 
-        <ul className="detail-list">
-          <li>
-            <span className="label">מספר הזמנה</span>
-            <span className="value">{reservation.id}</span>
-          </li>
-          <li>
-            <span className="label">שם המזמין</span>
-            <span className="value">{reservation.guest_name}</span>
-          </li>
-          <li>
-            <span className="label">תאריך כניסה</span>
-            <span className="value">{reservation.start_date}</span>
-          </li>
-          <li>
-            <span className="label">תאריך עזיבה</span>
-            <span className="value">{reservation.end_date}</span>
-          </li>
-          <li>
-            <span className="label">מלון מבוקש</span>
-            <span className="value">
-              {reservation.hotel.name} — {reservation.hotel.city}
-            </span>
-          </li>
-          <li>
-            <span className="label">חדר מבוקש</span>
-            <span className="value">{reservation.room.name}</span>
-          </li>
-        </ul>
+      <dl className="mt-12 grid grid-cols-2 border-t-2 border-ink sm:grid-cols-3">
+        <Fact label="Guest" value={reservation.guest_name} />
+        <Fact label="Hotel" value={`${reservation.hotel.name} — ${reservation.hotel.city}`} />
+        <Fact label="Room" value={reservation.room.name} />
+        <Fact label="Check in" value={reservation.start_date} />
+        <Fact label="Check out" value={reservation.end_date} />
+        <Fact label="Nights" value={reservation.nights} />
+      </dl>
 
-        <div className="price-box">
-          <div className="price-row">
-            <span>
-              {reservation.nights} לילות × {reservation.price_per_night} ₪
-            </span>
-            <span>{money(reservation.subtotal)}</span>
-          </div>
-          <div className="price-row">
-            <span>מע״מ ({Math.round(reservation.vat_rate * 100)}%)</span>
-            <span>{money(reservation.vat)}</span>
-          </div>
-          <div className="price-row total">
-            <span>מחיר סופי</span>
-            <span>{money(reservation.total_price)}</span>
-          </div>
-        </div>
+      <div className="mt-14 max-w-md border-t-2 border-ink pt-6">
+        <Line
+          left={`${reservation.nights} nights × ${reservation.price_per_night} ILS`}
+          right={money(reservation.subtotal)}
+        />
+        <Line left={`VAT ${Math.round(reservation.vat_rate * 100)}%`} right={money(reservation.vat)} />
 
-        <div className="actions">
-          <Link className="btn secondary" to="/hotels">
-            להזמנה נוספת
-          </Link>
+        <div className="mt-3 flex items-baseline justify-between border-t-2 border-ink pt-4">
+          <span className="label">Total</span>
+          <span className="text-4xl font-extrabold tracking-[-0.05em]">
+            <span className="bg-acid px-2">{money(reservation.total_price)}</span>
+            <span className="label ml-2 align-super text-smoke">ILS</span>
+          </span>
         </div>
       </div>
-    </>
+
+      <Link
+        to="/hotels"
+        className="label mt-12 mb-20 inline-block border-2 border-ink px-6 py-3 text-ink no-underline hover:bg-ink hover:text-paper"
+      >
+        Book another room
+      </Link>
+    </div>
+  );
+}
+
+function Fact({ label, value }) {
+  return (
+    <div className="border-b border-hairline py-5 pr-6">
+      <dt className="label mb-2 text-smoke">{label}</dt>
+      <dd className="text-lg font-bold tracking-[-0.02em]">{value}</dd>
+    </div>
+  );
+}
+
+function Line({ left, right }) {
+  return (
+    <div className="flex items-baseline justify-between py-1.5 font-mono text-[13px]">
+      <span className="text-smoke">{left}</span>
+      <span>{right}</span>
+    </div>
   );
 }

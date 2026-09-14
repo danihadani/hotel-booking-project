@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api.js';
 import { getUser } from '../auth.js';
+import Field, { Select, Errors, Submit, FormShell } from './Field.jsx';
+
+const PAGE_ERRORS = ['invalid_dates', 'invalid_room', 'unavaliable_room'];
 
 export default function BookingForm() {
   const user = getUser();
@@ -13,8 +16,7 @@ export default function BookingForm() {
   const [errors, setErrors] = useState([]);
   const [busy, setBusy] = useState(false);
 
-  // "הזמן עכשיו" from a room page arrives as /book?hotel=2&room=7 and pre-fills
-  // the two dropdowns.
+  // "Book this room" arrives as /book?hotel=2&room=7 and fills the dropdowns.
   const [form, setForm] = useState({
     guest_name: '',
     start_date: '',
@@ -33,14 +35,14 @@ export default function BookingForm() {
   }, []);
 
   useEffect(() => {
-    if (user) setForm((current) => ({ ...current, guest_name: current.guest_name || user.full_name }));
+    if (user) setForm((f) => ({ ...f, guest_name: f.guest_name || user.full_name }));
   }, [user]);
 
-  const change = (event) => setForm({ ...form, [event.target.name]: event.target.value });
+  const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const chosenRoom = useMemo(
-    () => rooms.find((room) => String(room.id) === String(form.room)),
-    [rooms, form.room]
+    () => rooms.find((r) => String(r.id) === String(form.room)),
+    [rooms, form.room],
   );
 
   async function submit(event) {
@@ -49,9 +51,9 @@ export default function BookingForm() {
 
     // ---- checks in the browser ----
     const found = [];
-    if (!form.guest_name.trim()) found.push('יש להזין שם מזמין');
-    if (!form.hotel) found.push('יש לבחור מלון');
-    if (!form.room) found.push('יש לבחור חדר');
+    if (!form.guest_name.trim()) found.push('Please enter a guest name');
+    if (!form.hotel) found.push('Please choose a hotel');
+    if (!form.room) found.push('Please choose a room');
     if (found.length) return setErrors(found);
 
     if (!form.start_date || !form.end_date || form.end_date <= form.start_date) {
@@ -65,83 +67,61 @@ export default function BookingForm() {
       navigate(`/reservation/${reservation.id}`, { replace: true });
     } catch (err) {
       // The server answers with the name of the page to show.
-      if (['invalid_dates', 'invalid_room', 'unavaliable_room'].includes(err.reason)) {
-        navigate(`/${err.reason}`);
-      } else {
-        setErrors([err.message]);
-      }
+      if (PAGE_ERRORS.includes(err.reason)) navigate(`/${err.reason}`);
+      else setErrors([err.message]);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="card">
-      <h2>טופס הזמנה</h2>
-      <p className="muted">
-        אפשר לבחור כל חדר מכל מלון. אם החדר אינו שייך למלון שנבחר — תתקבל הודעת שגיאה.
-      </p>
+    <FormShell eyebrow="Step 03 — your dates" title="BOOK A ROOM">
+      <form onSubmit={submit} className="grid gap-6">
+        <Errors items={errors} />
 
-      {errors.length > 0 && (
-        <div className="errors">
-          <ul>{errors.map((message) => <li key={message}>{message}</li>)}</ul>
+        <Field label="Guest name" name="guest_name" value={form.guest_name} onChange={change} required />
+
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Field label="Check in" type="date" name="start_date" value={form.start_date} onChange={change} required />
+          <Field label="Check out" type="date" name="end_date" value={form.end_date} onChange={change} required />
         </div>
-      )}
 
-      <form className="stack wide" onSubmit={submit}>
-        <label>
-          שם המזמין
-          <input name="guest_name" value={form.guest_name} onChange={change} required />
-        </label>
+        <Select label="Hotel" name="hotel" value={form.hotel} onChange={change} required>
+          <option value="">— choose a hotel —</option>
+          {hotels.map((h) => (
+            <option key={h.id} value={h.id}>
+              {String(h.id).padStart(2, '0')} · {h.name} — {h.city} ({h.stars}★)
+            </option>
+          ))}
+        </Select>
 
-        <label>
-          תאריך כניסה
-          <input type="date" name="start_date" value={form.start_date} onChange={change} required />
-        </label>
-
-        <label>
-          תאריך עזיבה
-          <input type="date" name="end_date" value={form.end_date} onChange={change} required />
-        </label>
-
-        <label>
-          מלון מבוקש
-          <select name="hotel" value={form.hotel} onChange={change} required>
-            <option value="">— בחרי מלון —</option>
-            {hotels.map((hotel) => (
-              <option key={hotel.id} value={hotel.id}>
-                {hotel.name} — {hotel.city} ({hotel.stars}★)
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label>
-          חדר מבוקש
-          <select name="room" value={form.room} onChange={change} required>
-            <option value="">— בחרי חדר —</option>
-            {rooms.map((room) => (
-              <option key={room.id} value={room.id}>
-                {room.hotel_name} / {room.name} — {room.price} ₪ ללילה
-              </option>
-            ))}
-          </select>
-          <span className="field-hint">הרשימה כוללת את כל החדרים בכל המלונות</span>
-        </label>
+        <Select
+          label="Room"
+          name="room"
+          value={form.room}
+          onChange={change}
+          required
+          hint="This list holds every room in every hotel"
+        >
+          <option value="">— choose a room —</option>
+          {rooms.map((r) => (
+            <option key={r.id} value={r.id}>
+              {String(r.id).padStart(2, '0')} · {r.hotel_name} / {r.name} — {r.price} ILS
+            </option>
+          ))}
+        </Select>
 
         {chosenRoom && (
-          <p className="muted">
-            נבחר: <strong>{chosenRoom.name}</strong> במלון {chosenRoom.hotel_name} · עד{' '}
-            {chosenRoom.max_guests} אורחים · {chosenRoom.size} מ״ר · {chosenRoom.price} ₪ ללילה
+          <p className="border-2 border-ink px-4 py-3 font-mono text-[12px] leading-[1.9]">
+            <b className="font-bold">{chosenRoom.name}</b> at {chosenRoom.hotel_name}
+            <br />
+            Up to {chosenRoom.max_guests} guests · {chosenRoom.size} m² ·{' '}
+            <span className="bg-acid px-1">{chosenRoom.price} ILS / night</span>
           </p>
         )}
 
-        <div className="actions">
-          <button className="btn" disabled={busy}>
-            {busy ? 'שולח…' : 'שלח הזמנה'}
-          </button>
-        </div>
+        <div><Submit busy={busy}>Send reservation →</Submit></div>
       </form>
-    </div>
+    </FormShell>
   );
 }

@@ -14,15 +14,15 @@ import Confirmation from './components/Confirmation.jsx';
 import { UnavaliableRoom, InvalidRoom, InvalidDates } from './components/ErrorPages.jsx';
 
 /**
- * The shape of the whole site: a fixed header, the page for the current
- * address, and a fixed footer. Only the middle changes as you navigate.
+ * The shape of the site: a fixed header, the page for the current address,
+ * and a fixed footer. Only the middle changes as you navigate.
  */
 export default function App() {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Header />
 
-      <main className="page">
+      <main className="flex-1">
         <Routes>
           {/* Open to everyone */}
           <Route path="/" element={<Home />} />
@@ -46,9 +46,12 @@ export default function App() {
         </Routes>
       </main>
 
-      <footer className="site-footer">
-        פרויקט מסכם — From Web to Database · Express + React + PostgreSQL
+      <footer className="border-t-2 border-ink">
+        <div className="mx-auto flex max-w-6xl flex-wrap gap-x-8 gap-y-2 px-6 py-6 sm:px-9">
+          <span className="label text-smoke">From Web to Database — final project</span>
+          <span className="label ml-auto text-smoke">Express · React · PostgreSQL · Prisma</span>
+        </div>
       </footer>
-    </>
+    </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 import { saveLogin } from '../auth.js';
+import Field, { Errors, Submit, FormShell } from './Field.jsx';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,15 +11,14 @@ export default function Login() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const change = (event) => setForm({ ...form, [event.target.name]: event.target.value });
+  const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   async function submit(event) {
     event.preventDefault();
     setError('');
     setBusy(true);
     try {
-      const data = await api.login(form);
-      saveLogin(data); // keeps the token and the user in localStorage
+      saveLogin(await api.login(form));   // keeps the token in localStorage
       navigate(location.state?.from || '/hotels', { replace: true });
     } catch (err) {
       setError(err.message);
@@ -28,30 +28,20 @@ export default function Login() {
   }
 
   return (
-    <div className="card">
-      <h2>כניסה לאתר</h2>
-
-      {error && <div className="errors">{error}</div>}
-
-      <form className="stack" onSubmit={submit}>
-        <label>
-          שם משתמש
-          <input name="username" value={form.username} onChange={change} required autoFocus />
-        </label>
-        <label>
-          סיסמה
-          <input type="password" name="password" value={form.password} onChange={change} required />
-        </label>
-        <div className="actions">
-          <button className="btn" disabled={busy}>
-            {busy ? 'רגע…' : 'כניסה'}
-          </button>
-        </div>
+    <FormShell eyebrow="Welcome back" title="LOG IN">
+      <form onSubmit={submit} className="grid gap-6">
+        <Errors items={error ? [error] : []} />
+        <Field label="Username" name="username" value={form.username} onChange={change} required autoFocus />
+        <Field label="Password" type="password" name="password" value={form.password} onChange={change} required />
+        <div><Submit busy={busy}>Log in →</Submit></div>
       </form>
 
-      <p className="muted">
-        עוד אין לך חשבון? <Link to="/register">להרשמה</Link>
+      <p className="label mt-10 text-smoke">
+        No account yet?{' '}
+        <Link to="/register" className="text-ink underline decoration-acid decoration-4 underline-offset-4">
+          Sign up
+        </Link>
       </p>
-    </div>
+    </FormShell>
   );
 }
