@@ -1,9 +1,10 @@
 /**
- * The home page banner: oversized type next to a photograph.
+ * The home page banner: oversized type next to a sunset over the sea.
  *
- * The photo is dithered down to pure black and white - no greys at all - so
- * it sits with the rest of the design instead of fighting it. The file lives
- * in client/public, and tools/dither.py is what produced it.
+ * The picture is not a photograph - it is drawn from gradients and noise by
+ * tools/make_hero.py, then reduced to pure black and white with no greys at
+ * all. That keeps it in step with the rest of the design, and means the
+ * project carries no image file it did not make itself.
  */
 export default function Hero() {
   return (
@@ -31,7 +32,7 @@ export default function Hero() {
         className="min-h-[260px] border-ink bg-ink bg-cover bg-center md:min-h-full md:border-l-2"
         style={{ backgroundImage: "url('/hero.png')" }}
         role="img"
-        aria-label="The sun setting over the sea"
+        aria-label="A sunset over the sea, drawn in black and white"
       />
     </section>
   );
