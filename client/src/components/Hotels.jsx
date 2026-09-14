@@ -42,7 +42,7 @@ export default function Hotels() {
 
             <span className="col-start-2 flex items-baseline gap-3 sm:col-start-4 sm:justify-end">
               <Stars count={hotel.stars} />
-              <span className="label text-smoke">{hotel.number_of_rooms} rm</span>
+              <span className="label text-smoke">{hotel.numberOfRooms} rm</span>
             </span>
           </Link>
         ))}

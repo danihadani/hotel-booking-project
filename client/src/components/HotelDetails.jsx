@@ -38,7 +38,7 @@ export default function HotelDetails() {
       <div className="mt-14 flex items-end justify-between border-b-2 border-ink pb-3">
         <h2 className="text-2xl font-extrabold tracking-[-0.04em]">Rooms</h2>
         <p className="label text-smoke">
-          {hotel.rooms.length} listed / {hotel.number_of_rooms} in the hotel
+          {hotel.rooms.length} listed / {hotel.numberOfRooms} in the hotel
         </p>
       </div>
 
@@ -53,7 +53,7 @@ export default function HotelDetails() {
             <span className="box-decoration-clone px-1 -mx-1 group-hover:bg-acid">{room.name}</span>
           </span>
           <span className="flex items-baseline gap-4">
-            <span className="label text-smoke">{room.max_guests} guests</span>
+            <span className="label text-smoke">{room.maxGuests} guests</span>
             <span className="text-xl font-extrabold tracking-[-0.04em]">
               {room.price}
               <span className="label ml-1 align-super text-smoke">ILS</span>

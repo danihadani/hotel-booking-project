@@ -106,16 +106,16 @@ export default function BookingForm() {
           <option value="">— choose a room —</option>
           {rooms.map((r) => (
             <option key={r.id} value={r.id}>
-              {String(r.id).padStart(2, '0')} · {r.hotel_name} / {r.name} — {r.price} ILS
+              {String(r.id).padStart(2, '0')} · {r.hotel.name} / {r.name} — {r.price} ILS
             </option>
           ))}
         </Select>
 
         {chosenRoom && (
           <p className="border-2 border-ink px-4 py-3 font-mono text-[12px] leading-[1.9]">
-            <b className="font-bold">{chosenRoom.name}</b> at {chosenRoom.hotel_name}
+            <b className="font-bold">{chosenRoom.name}</b> at {chosenRoom.hotel.name}
             <br />
-            Up to {chosenRoom.max_guests} guests · {chosenRoom.size} m² ·{' '}
+            Up to {chosenRoom.maxGuests} guests · {chosenRoom.size} m² ·{' '}
             <span className="bg-acid px-1">{chosenRoom.price} ILS / night</span>
           </p>
         )}

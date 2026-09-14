@@ -24,31 +24,11 @@ app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
 
 /******************** Output Helpers ********************/
-// Prisma speaks camelCase (numberOfRooms), the assignment's API speaks
-// snake_case (number_of_rooms). These two functions are the translation,
-// and they are the ONLY place the shape of a response is decided.
-
-function hotelToJson(hotel) {
-  return {
-    id: hotel.id,
-    name: hotel.name,
-    country: hotel.country,
-    city: hotel.city,
-    number_of_rooms: hotel.numberOfRooms,
-    stars: hotel.stars,
-  };
-}
-
-function roomToJson(room) {
-  return {
-    id: room.id,
-    name: room.name,
-    max_guests: room.maxGuests,
-    price: room.price,
-    size: room.size,
-    hotel: room.hotelId, // the assignment calls the foreign key "hotel"
-  };
-}
+// Hotels and rooms go out exactly as Prisma hands them over - the field
+// names in the schema are already the ones the API promises.
+//
+// A reservation is different: it needs its dates turned into plain strings
+// and its final price worked out, so it gets a function of its own below.
 
 // Prisma hands dates back as JavaScript Date objects; the API speaks
 // plain "YYYY-MM-DD" strings.
@@ -73,27 +53,17 @@ function reservationToJson(reservation) {
   const { subtotal, vat, total } = calculatePrice(reservation.pricePerNight, reservation.nights);
   return {
     id: reservation.id,
-    guest_name: reservation.guestName,
-    start_date: dateToText(reservation.startDate),
-    end_date: dateToText(reservation.endDate),
+    guestName: reservation.guestName,
+    startDate: dateToText(reservation.startDate),
+    endDate: dateToText(reservation.endDate),
     nights: reservation.nights,
-    price_per_night: reservation.pricePerNight,
+    pricePerNight: reservation.pricePerNight,
     subtotal,
-    vat_rate: VAT_RATE,
+    vatRate: VAT_RATE,
     vat,
-    total_price: total,
-    hotel: {
-      id: reservation.hotel.id,
-      name: reservation.hotel.name,
-      city: reservation.hotel.city,
-      country: reservation.hotel.country,
-    },
-    room: {
-      id: reservation.room.id,
-      name: reservation.room.name,
-      max_guests: reservation.room.maxGuests,
-      size: reservation.room.size,
-    },
+    totalPrice: total,
+    hotel: reservation.hotel,
+    room: reservation.room,
   };
 }
 
@@ -205,7 +175,7 @@ app.get("/api/hotels", auth, async (req, res) => {
   try {
     const hotels = await prisma.hotel.findMany({ orderBy: { id: "asc" } });
 
-    return res.status(200).json(hotels.map(hotelToJson));
+    return res.status(200).json(hotels);
   } catch (err) {
     console.error("GET /api/hotels", err);
     return res.status(500).json({ error: "Failed to fetch hotels" });
@@ -230,10 +200,7 @@ app.get("/api/hotels/:id", auth, async (req, res) => {
       return res.status(404).json({ error: "Hotel not found" });
     }
 
-    return res.status(200).json({
-      ...hotelToJson(hotel),
-      rooms: hotel.rooms.map(roomToJson),
-    });
+    return res.status(200).json(hotel);
   } catch (err) {
     console.error("GET /api/hotels/:id", err);
     return res.status(500).json({ error: "Failed to fetch hotel" });
@@ -272,7 +239,7 @@ app.post("/api/hotel", async (req, res) => {
       },
     });
 
-    return res.status(201).json(hotelToJson(hotel));
+    return res.status(201).json(hotel);
   } catch (err) {
     console.error("POST /api/hotel", err);
     return res.status(500).json({ error: "Failed to create hotel" });
@@ -289,9 +256,7 @@ app.get("/api/rooms", auth, async (req, res) => {
       include: { hotel: true },
     });
 
-    return res.status(200).json(
-      rooms.map((room) => ({ ...roomToJson(room), hotel_name: room.hotel.name })),
-    );
+    return res.status(200).json(rooms);
   } catch (err) {
     console.error("GET /api/rooms", err);
     return res.status(500).json({ error: "Failed to fetch rooms" });
@@ -315,13 +280,7 @@ app.get("/api/rooms/:id", auth, async (req, res) => {
       return res.status(404).json({ error: "Room not found" });
     }
 
-    return res.status(200).json({
-      ...roomToJson(room),
-      hotel_name: room.hotel.name,
-      city: room.hotel.city,
-      country: room.hotel.country,
-      stars: room.hotel.stars,
-    });
+    return res.status(200).json(room);
   } catch (err) {
     console.error("GET /api/rooms/:id", err);
     return res.status(500).json({ error: "Failed to fetch room" });
@@ -371,7 +330,7 @@ app.post("/api/room", async (req, res) => {
       },
     });
 
-    return res.status(201).json(roomToJson(room));
+    return res.status(201).json(room);
   } catch (err) {
     console.error("POST /api/room", err);
     return res.status(500).json({ error: "Failed to create room" });
@@ -522,7 +481,7 @@ app.get("/api/available_rooms", async (req, res) => {
       return res.status(200).json("No rooms found on these dates");
     }
 
-    return res.status(200).json(rooms.map(roomToJson));
+    return res.status(200).json(rooms);
   } catch (err) {
     console.error("GET /api/available_rooms", err);
     return res.status(500).json({ error: "Failed to search for available rooms" });

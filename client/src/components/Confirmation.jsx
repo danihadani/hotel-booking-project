@@ -26,25 +26,25 @@ export default function Confirmation() {
       </h1>
 
       <dl className="mt-12 grid grid-cols-2 border-t-2 border-ink sm:grid-cols-3">
-        <Fact label="Guest" value={reservation.guest_name} />
+        <Fact label="Guest" value={reservation.guestName} />
         <Fact label="Hotel" value={`${reservation.hotel.name} — ${reservation.hotel.city}`} />
         <Fact label="Room" value={reservation.room.name} />
-        <Fact label="Check in" value={reservation.start_date} />
-        <Fact label="Check out" value={reservation.end_date} />
+        <Fact label="Check in" value={reservation.startDate} />
+        <Fact label="Check out" value={reservation.endDate} />
         <Fact label="Nights" value={reservation.nights} />
       </dl>
 
       <div className="mt-14 max-w-md border-t-2 border-ink pt-6">
         <Line
-          left={`${reservation.nights} nights × ${reservation.price_per_night} ILS`}
+          left={`${reservation.nights} nights × ${reservation.pricePerNight} ILS`}
           right={money(reservation.subtotal)}
         />
-        <Line left={`VAT ${Math.round(reservation.vat_rate * 100)}%`} right={money(reservation.vat)} />
+        <Line left={`VAT ${Math.round(reservation.vatRate * 100)}%`} right={money(reservation.vat)} />
 
         <div className="mt-3 flex items-baseline justify-between border-t-2 border-ink pt-4">
           <span className="label">Total</span>
           <span className="text-4xl font-extrabold tracking-[-0.05em]">
-            <span className="bg-acid px-2">{money(reservation.total_price)}</span>
+            <span className="bg-acid px-2">{money(reservation.totalPrice)}</span>
             <span className="label ml-2 align-super text-smoke">ILS</span>
           </span>
         </div>
