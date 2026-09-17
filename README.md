@@ -180,3 +180,7 @@ tools/
 The banner on the home page is not a photograph — it is drawn by
 `tools/make_hero.py` and dithered to one-bit black and white, so the project
 carries no image it did not produce itself.
+
+---
+
+[MIT licensed](LICENSE).
