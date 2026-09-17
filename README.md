@@ -120,7 +120,7 @@ together, so the site and `POST /api/hotel/` share `127.0.0.1:8000`.
 | GET | `/api/reservations/:id` | ✓ | read one back |
 
 Ready-made requests for all of them are in [`requests.http`](requests.http)
-(VS Code REST Client) and [`postman_collection.json`](postman_collection.json).
+(VS Code REST Client) and [`postman_collection.json`](docs/postman_collection.json).
 
 ---
 
