@@ -5,7 +5,7 @@ import { isLoggedIn } from '../auth.js';
 const STEPS = [
   ['01', 'Sign up', 'You have to be registered before you can do anything here.'],
   ['02', 'Pick a hotel', 'Five properties, twenty-six rooms, four countries.'],
-  ['03', 'Choose your dates', 'We check the room is free before confirming.'],
+  ['03', 'Choose your dates', 'We check if the room is free before confirming.'],
 ];
 
 export default function Home() {
