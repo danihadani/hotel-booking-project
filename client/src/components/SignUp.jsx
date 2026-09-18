@@ -6,7 +6,7 @@ import Field, { Errors, Submit, FormShell } from './Field.jsx';
 
 const EMPTY = { username: '', full_name: '', email: '', password: '', password_confirm: '' };
 
-export default function Register() {
+export default function SignUp() {
   const navigate = useNavigate();
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState([]);

@@ -38,7 +38,7 @@ export default function Login() {
 
       <p className="label mt-10 text-smoke">
         No account yet?{' '}
-        <Link to="/register" className="text-ink underline decoration-acid decoration-4 underline-offset-4">
+        <Link to="/signup" className="text-ink underline decoration-acid decoration-4 underline-offset-4">
           Sign up
         </Link>
       </p>

@@ -30,7 +30,7 @@ export default function Home() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 border-t-2 border-ink py-10">
-          <Link to="/register" className="label bg-acid px-6 py-3.5 text-ink no-underline hover:bg-ink hover:text-paper">
+          <Link to="/signup" className="label bg-acid px-6 py-3.5 text-ink no-underline hover:bg-ink hover:text-paper">
             Sign up
           </Link>
           <Link to="/hotels" className="label border-2 border-ink px-6 py-3 text-ink no-underline hover:bg-ink hover:text-paper">

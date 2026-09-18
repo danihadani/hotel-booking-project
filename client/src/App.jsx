@@ -5,7 +5,7 @@ import RequireAuth from './components/RequireAuth.jsx';
 
 import Home from './components/Home.jsx';
 import Login from './components/Login.jsx';
-import Register from './components/Register.jsx';
+import SignUp from './components/SignUp.jsx';
 import Hotels from './components/Hotels.jsx';
 import HotelDetails from './components/HotelDetails.jsx';
 import RoomDetails from './components/RoomDetails.jsx';
@@ -26,7 +26,7 @@ export default function App() {
         <Routes>
           {/* Open to everyone */}
           <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
 
           {/* Only for a logged-in user */}
