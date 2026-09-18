@@ -5,23 +5,25 @@ import { saveLogin } from '../auth.js';
 import Field, { Errors, Submit, FormShell } from './Field.jsx';
 
 export default function Login() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [form, setForm] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  async function submit(event) {
-    event.preventDefault();
-    setError('');
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setMessage('');
     setBusy(true);
+
     try {
-      saveLogin(await api.login(form));   // keeps the token in localStorage
+      const data = await api.login({ username, password });
+      saveLogin(data);                      // the token goes into localStorage
       navigate(location.state?.from || '/hotels', { replace: true });
     } catch (err) {
-      setError(err.message);
+      setMessage(err.message);
     } finally {
       setBusy(false);
     }
@@ -29,10 +31,26 @@ export default function Login() {
 
   return (
     <FormShell eyebrow="Welcome back" title="LOG IN">
-      <form onSubmit={submit} className="grid gap-6">
-        <Errors items={error ? [error] : []} />
-        <Field label="Username" name="username" value={form.username} onChange={change} required autoFocus />
-        <Field label="Password" type="password" name="password" value={form.password} onChange={change} required />
+      <form onSubmit={handleSubmit} className="grid gap-6">
+        <Errors items={message ? [message] : []} />
+
+        <Field
+          label="Username"
+          name="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          autoFocus
+        />
+        <Field
+          label="Password"
+          type="password"
+          name="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
         <div><Submit busy={busy}>Log in →</Submit></div>
       </form>
 
