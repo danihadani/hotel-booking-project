@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api.js';
 import Stars from './Stars.jsx';
-import { Notice } from './Hotels.jsx';
+import Notice from './Notice.jsx';
 
 export default function HotelDetails() {
   const { id } = useParams();

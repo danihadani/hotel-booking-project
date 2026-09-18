@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import Stars from './Stars.jsx';
+import Notice from './Notice.jsx';
 
 export default function Hotels() {
   const [hotels, setHotels] = useState(null);
@@ -49,8 +50,4 @@ export default function Hotels() {
       </div>
     </div>
   );
-}
-
-export function Notice({ children }) {
-  return <p className="label mx-auto max-w-6xl px-6 py-16 text-smoke sm:px-9">{children}</p>;
 }
